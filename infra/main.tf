@@ -3,6 +3,13 @@ resource "aws_s3_bucket" "s3_bucket" {
   bucket = "${var.name_prefix}-${var.s3_bucket_name}-${var.name_postfix}"
   force_destroy = false
 }
+
+resource "aws_s3_bucket_versioning" "log_bucket_versioning" {
+  bucket = aws_s3_bucket.s3_bucket.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
 resource "aws_s3_bucket_server_side_encryption_configuration" "call_record_bucket_encryption_configuration" {
   count = var.create_bucket ? 1: 0
   bucket = aws_s3_bucket.s3_bucket[0].id
@@ -53,3 +60,33 @@ resource "aws_kms_key" "s3_kms_key" {
   })
 }
 
+resource "aws_s3_bucket_versioning" "bucket_versioning" {
+      bucket = aws_s3_bucket.s3_bucket.id
+      versioning_configuration {
+        status = "Enabled"
+      }
+    }
+resource "aws_s3_bucket" "log_bucket" {
+  bucket = "${var.name_prefix}-my-s3-access-logs-${var.name_postfix}"
+}
+resource "aws_s3_bucket_versioning" "log_bucket_versioning" {
+  bucket = aws_s3_bucket.log_bucket.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+resource "aws_s3_bucket_acl" "my_bucket_acl" {
+  bucket = aws_s3_bucket.log_bucket.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "call_record_bucket_encryption_configuration" {
+  count = var.create_bucket ? 1: 0
+  bucket = aws_s3_bucket.log_bucket[0].id
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.s3_kms_key.arn
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
