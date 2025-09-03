@@ -92,7 +92,7 @@ resource "aws_s3_bucket_versioning" "bucket_versioning" {
       }
     }
 
-resource "aws_s3_bucket_versioning" "log_bucket_versioning" {
+resource "aws_s3_bucket_versioning" "s3_log_bucket_versioning" {
   bucket = aws_s3_bucket.log_bucket.id
   versioning_configuration {
     status = "Enabled"
@@ -131,7 +131,7 @@ resource "aws_s3_bucket_public_access_block" "s3_bucket_log_public" {
   restrict_public_buckets = true
   
 }
-resource "aws_s3_bucket_server_side_encryption_configuration" "call_record_bucket_encryption_configuration" {
+resource "aws_s3_bucket_server_side_encryption_configuration" "s3_bucket_log_encryption_configuration" {
   count = var.create_bucket ? 1: 0
   bucket = aws_s3_bucket.log_bucket[0].id
   rule {
