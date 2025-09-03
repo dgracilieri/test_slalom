@@ -23,6 +23,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "call_record_bucke
 
 resource "aws_kms_key" "s3_kms_key" {
   description             = "KMS key for S3 bucket encryption"
+  is_enabled = true
+  enable_key_rotation = true
   deletion_window_in_days = 10
   policy = jsonencode({
     Version = "2012-10-17"
@@ -66,18 +68,23 @@ resource "aws_s3_bucket_versioning" "bucket_versioning" {
         status = "Enabled"
       }
     }
-resource "aws_s3_bucket" "log_bucket" {
-  bucket = "${var.name_prefix}-my-s3-access-logs-${var.name_postfix}"
-}
+
 resource "aws_s3_bucket_versioning" "log_bucket_versioning" {
   bucket = aws_s3_bucket.log_bucket.id
   versioning_configuration {
     status = "Enabled"
   }
 }
-resource "aws_s3_bucket_acl" "my_bucket_acl" {
+resource "aws_s3_bucket_acl" "s3_bucket_acl" {
   bucket = aws_s3_bucket.log_bucket.id
   acl    = "private"
+}
+
+resource "aws_s3_bucket_logging" "s3_bucket_log" {
+  bucket = "${var.name_prefix}-my-s3-access-logs-${var.name_postfix}"
+  target_bucket = aws_s3_bucket.s3_bucket.id
+  target_prefix = "log/"
+  
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "call_record_bucket_encryption_configuration" {
