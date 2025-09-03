@@ -21,6 +21,14 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "call_record_bucke
   }
 }
 
+resource "aws_s3_bucket_public_access_block" "s3_bucket_public" {
+  bucket = aws_s3_bucket.s3_bucket.id
+  block_public_acls   = true
+  block_public_policy = true
+  ignore_public_acls  = true
+  restrict_public_buckets = tru
+  
+}
 resource "aws_kms_key" "s3_kms_key" {
   description             = "KMS key for S3 bucket encryption"
   is_enabled = true
@@ -87,6 +95,14 @@ resource "aws_s3_bucket_logging" "s3_bucket_log" {
   
 }
 
+resource "aws_s3_bucket_public_access_block" "s3_bucket_log_public" {
+  bucket = aws_s3_bucket.s3_bucket_log.id
+  block_public_acls   = true
+  block_public_policy = true
+  ignore_public_acls  = true
+  restrict_public_buckets = tru
+  
+}
 resource "aws_s3_bucket_server_side_encryption_configuration" "call_record_bucket_encryption_configuration" {
   count = var.create_bucket ? 1: 0
   bucket = aws_s3_bucket.log_bucket[0].id
@@ -100,6 +116,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "call_record_bucke
 
 resource "aws_sns_topic" "s3_bucket_notifications" {
   name = "bucket-notifications"
+  kms_master_key_id = "alias/aws/sns"
 }
 
 resource "aws_s3_bucket_notification" "s3_bucket_notification" {
