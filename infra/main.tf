@@ -2,6 +2,25 @@ resource "aws_s3_bucket" "s3_bucket" {
   count  = var.create_bucket ? 1: 0
   bucket = "${var.name_prefix}-${var.s3_bucket_name}-${var.name_postfix}"
   force_destroy = false
+ 
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "s3_bucket_lifecycle" {
+  bucket = aws_s3_bucket.s3_bucket.id
+
+  rule {
+    id     = "log_transition"
+    status = "Enabled"
+
+    transition {
+      days          = 30
+      storage_class = "GLACIER"
+    }
+
+    expiration {
+      days = 90
+    }
+  }
 }
 
 resource "aws_s3_bucket_versioning" "log_bucket_versioning" {
@@ -26,7 +45,7 @@ resource "aws_s3_bucket_public_access_block" "s3_bucket_public" {
   block_public_acls   = true
   block_public_policy = true
   ignore_public_acls  = true
-  restrict_public_buckets = tru
+  restrict_public_buckets = true
   
 }
 resource "aws_kms_key" "s3_kms_key" {
@@ -95,12 +114,30 @@ resource "aws_s3_bucket_logging" "s3_bucket_log" {
   
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "s3_bucket_log_lifecycle" {
+  bucket = aws_s3_bucket.s3_bucket_log.id
+
+  rule {
+    id     = "log_transition"
+    status = "Enabled"
+
+    transition {
+      days          = 30
+      storage_class = "GLACIER"
+    }
+
+    expiration {
+      days = 90
+    }
+  }
+}
+
 resource "aws_s3_bucket_public_access_block" "s3_bucket_log_public" {
   bucket = aws_s3_bucket.s3_bucket_log.id
   block_public_acls   = true
   block_public_policy = true
   ignore_public_acls  = true
-  restrict_public_buckets = tru
+  restrict_public_buckets = true
   
 }
 resource "aws_s3_bucket_server_side_encryption_configuration" "call_record_bucket_encryption_configuration" {
