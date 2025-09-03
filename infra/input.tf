@@ -1,3 +1,4 @@
+#General Variables
 variable "name_prefix" {
   type = string
 }
