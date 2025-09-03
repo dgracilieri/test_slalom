@@ -6,9 +6,7 @@ resource "aws_s3_bucket" "s3_bucket" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "s3_bucket_lifecycle" {
-  bucket = aws_s3_bucket.s3_bucket.id
-
-
+  bucket = aws_s3_bucket.s3_bucket[0].id
   rule {
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
