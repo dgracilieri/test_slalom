@@ -82,5 +82,5 @@ jobs:
 
     - name: Terraform Apply
       id: apply
-      run: terraform apply -auto-approve tfplan -var-file=tfvars/terraform-dev.tfvars
+      run: terraform apply -var-file=tfvars/terraform-dev.tfvars --auto-approve tfplan 
       working-directory:  ${{ env.WORKING_DIRECTORY }}
