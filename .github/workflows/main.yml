@@ -1,0 +1,63 @@
+name: 'Terraform Deploy'
+
+on:
+  push:
+    branches:
+        - main
+        - dgracili
+env:
+  AWS_REGION: us-east-1
+  TF_VERSION: 1.13.1
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+
+      #Configure terraform
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
+        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Format
+      id: format
+      run: terraform fmt 
+
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate -no-color
+    
+    - name: Run Checkov
+      id: checkov
+      uses: bridgecrewio/checkov-action@v12
+      with:
+        directory: . 
+        framework: terraform 
+      continue-on-error: false 
+
+    - name: Terraform Plan
+      id: plan
+      run: |
+          terraform plan -no-color -out=tfplan
+          terraform show -no-color tfplan
+
+    - name: Terraform Apply
+      id: apply
+      run: terraform apply -auto-approve tfplan
