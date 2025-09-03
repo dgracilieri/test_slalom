@@ -35,6 +35,7 @@ jobs:
 
     - name: Terraform Init
       run: terraform init
+      working-directory:  ${{ env.WORKING_DIRECTORY }}
 
       #Validate IaC in terraform
     - name: Terraform Format
