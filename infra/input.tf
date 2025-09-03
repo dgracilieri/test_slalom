@@ -7,9 +7,9 @@ variable "name_postfix" {
 }
 
 variable "s3_bucket_name" {
-  type        = string
+  type = string
 }
 
 variable "create_bucket" {
-  type        = bool
+  type = bool
 }

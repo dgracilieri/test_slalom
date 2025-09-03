@@ -1,14 +1,14 @@
 resource "aws_s3_bucket" "s3_bucket" {
-  count  = var.create_bucket ? 1: 0
-  bucket = "${var.name_prefix}-${var.s3_bucket_name}-${var.name_postfix}"
+  count         = var.create_bucket ? 1 : 0
+  bucket        = "${var.name_prefix}-${var.s3_bucket_name}-${var.name_postfix}"
   force_destroy = false
- 
+
 }
 
 # resource "aws_s3_bucket_lifecycle_configuration" "s3_bucket_lifecycle" {
 #   bucket = aws_s3_bucket.s3_bucket.id
 
-  
+
 #   rule {
 #     abort_incomplete_multipart_upload {
 #       days_after_initiation = 7
@@ -42,7 +42,7 @@ resource "aws_s3_bucket" "s3_bucket" {
 #   block_public_policy = true
 #   ignore_public_acls  = true
 #   restrict_public_buckets = true
-  
+
 # }
 # resource "aws_kms_key" "s3_kms_key" {
 #   description             = "KMS key for S3 bucket encryption"
@@ -107,7 +107,7 @@ resource "aws_s3_bucket" "s3_bucket" {
 #   bucket = "${var.name_prefix}-my-s3-access-logs-${var.name_postfix}"
 #   target_bucket = aws_s3_bucket.s3_bucket.id
 #   target_prefix = "log/"
-  
+
 # }
 
 # resource "aws_s3_bucket_lifecycle_configuration" "s3_bucket_log_lifecycle" {
@@ -129,7 +129,7 @@ resource "aws_s3_bucket" "s3_bucket" {
 #   block_public_policy = true
 #   ignore_public_acls  = true
 #   restrict_public_buckets = true
-  
+
 # }
 # resource "aws_s3_bucket_server_side_encryption_configuration" "s3_bucket_log_encryption_configuration" {
 #   count = var.create_bucket ? 1: 0
