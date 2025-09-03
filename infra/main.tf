@@ -8,18 +8,14 @@ resource "aws_s3_bucket" "s3_bucket" {
 resource "aws_s3_bucket_lifecycle_configuration" "s3_bucket_lifecycle" {
   bucket = aws_s3_bucket.s3_bucket.id
 
+  
   rule {
-    id     = "log_transition"
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+   }
+    filter {}
+    id = "log"
     status = "Enabled"
-
-    transition {
-      days          = 30
-      storage_class = "GLACIER"
-    }
-
-    expiration {
-      days = 90
-    }
   }
 }
 
@@ -118,17 +114,12 @@ resource "aws_s3_bucket_lifecycle_configuration" "s3_bucket_log_lifecycle" {
   bucket = aws_s3_bucket.s3_bucket_log.id
 
   rule {
-    id     = "log_transition"
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+   }
+    filter {}
+    id = "log"
     status = "Enabled"
-
-    transition {
-      days          = 30
-      storage_class = "GLACIER"
-    }
-
-    expiration {
-      days = 90
-    }
   }
 }
 
