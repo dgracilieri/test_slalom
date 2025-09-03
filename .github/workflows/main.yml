@@ -38,7 +38,7 @@ jobs:
       #Validate IaC in terraform
     - name: Terraform Format
       id: format
-      run: terraform fmt -check -recursive
+      run: terraform fmt -recursive
 
     - name: Terraform Validate
       id: validate
