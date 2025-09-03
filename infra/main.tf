@@ -97,3 +97,17 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "call_record_bucke
     }
   }
 }
+
+resource "aws_sns_topic" "s3_bucket_notifications" {
+  name = "bucket-notifications"
+}
+
+resource "aws_s3_bucket_notification" "s3_bucket_notification" {
+  bucket = aws_s3_bucket.s3_bucket.id
+
+  topic {
+    topic_arn     = aws_sns_topic.s3_bucket_notifications.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_prefix = "logs/"
+  }
+}
