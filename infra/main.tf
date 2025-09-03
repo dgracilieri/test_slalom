@@ -18,7 +18,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "s3_bucket_lifecycle" {
 }
 
 resource "aws_s3_bucket_versioning" "log_bucket_versioning" {
-  bucket = aws_s3_bucket.s3_bucket.id
+  bucket = aws_s3_bucket.s3_bucket[0].id
   versioning_configuration {
     status = "Enabled"
   }
@@ -35,7 +35,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "s3_bucket_encrypt
 }
 
 resource "aws_s3_bucket_public_access_block" "s3_bucket_public" {
-  bucket = aws_s3_bucket.s3_bucket.id
+  bucket = aws_s3_bucket.s3_bucket[0].id
   block_public_acls   = true
   block_public_policy = true
   ignore_public_acls  = true
@@ -84,7 +84,7 @@ resource "aws_kms_key" "s3_kms_key" {
 }
 
 resource "aws_s3_bucket_versioning" "bucket_versioning" {
-      bucket = aws_s3_bucket.s3_bucket.id
+      bucket = aws_s3_bucket.s3_bucket[0].id
       versioning_configuration {
         status = "Enabled"
       }
