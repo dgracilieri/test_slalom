@@ -92,7 +92,7 @@ resource "aws_s3_bucket_versioning" "bucket_versioning" {
 
 
 resource "aws_s3_bucket_acl" "s3_bucket_acl" {
-  bucket = aws_s3_bucket_logging.s3_bucket.id
+  bucket = aws_s3_bucket_logging.s3_bucket[0].id
   acl    = "private"
 }
 
