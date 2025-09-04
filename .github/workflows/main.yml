@@ -101,13 +101,13 @@ jobs:
     - name: Conditional Terraform Apply or Destroy
       id: apply_or_destroy
       run: |
-          DESTROY_FLAG=$(jq -r '.destroy_infrastructure' tfvars/terraform-dev.tfvars)
+          DESTROY_FLAG=$(jq -r '.destroy_infrastructure' tfvars/vars.json)
           
           if [[ "$DESTROY_FLAG" == "true" ]]; then
             echo "Variable 'destroy_infrastructure' es 'true'. running 'terraform destroy'."
-            terraform destroy -var-file=tfvars/terraform-dev.tfvars --auto-approve tfplan 
+            terraform destroy -var-file=tfvars/tfvars/vars.json --auto-approve tfplan 
           else
             echo "Variable 'destroy_infrastructure' es 'false'. running 'terraform apply'."
-            terraform apply -var-file=tfvars/terraform-dev.tfvars --auto-approve tfplan 
+            terraform apply -var-file=tfvars/tfvars/vars.json --auto-approve tfplan 
           fi
       working-directory: ${{ env.WORKING_DIRECTORY }}

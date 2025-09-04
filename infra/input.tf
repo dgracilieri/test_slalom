@@ -14,8 +14,3 @@ variable "create_bucket" {
   type = bool
 }
 
-variable "destroy_infrastructure" {
-  description = "Set to true to destroy all resources. Do not use in production."
-  type        = bool
-  default     = false
-}
