@@ -83,12 +83,12 @@ jobs:
       #run: terraform plan -no-color -out=tfplan -var-file=tfvars/terraform-dev.tfvars
       run: |
           DESTROY_FLAG=$(jq -r '.destroy_infrastructure' tfvars/vars.json)
-          echo $DESTROY_FLAG
-          # if [[ "$DESTROY_FLAG" == "true"]]; then
-          #   echo "dont run for destroy infraestructure"
-          # else
-          #   terraform plan -no-color -out=tfplan -var-file=tfvars/terraform-dev.tfvars
-          # fi
+         
+          if [[ "$DESTROY_FLAG" == "true" ]]; then
+            echo "dont run for destroy infraestructure"
+          else
+            terraform plan -no-color -out=tfplan -var-file=tfvars/terraform-dev.tfvars
+          fi
           
       working-directory: ${{ env.WORKING_DIRECTORY }}
 
