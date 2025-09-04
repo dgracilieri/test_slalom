@@ -6,4 +6,10 @@ terraform {
       version = "6.11.0"
     }
   }
+
+backend "s3" {
+    bucket = "tfstateslaomiac"  
+    key    = "tfstateslaomiac/terraform.tfstate"
+    region = "us-east-1"
+  }
 }
