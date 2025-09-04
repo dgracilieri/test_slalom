@@ -109,9 +109,9 @@ jobs:
  
           if [[  "$DESTROY_FLAG" == "true" ]]; then
             echo "Variable 'destroy_infrastructure' es 'true'. running 'terraform destroy'."
-            terraform destroy -var-file=tfvars\terraform-dev.tfvars --auto-approve tfplan 
+            terraform destroy -var-file=tfvars/terraform-dev.tfvars --auto-approve tfplan 
           else
             echo "Variable 'destroy_infrastructure' es 'false'. running 'terraform apply'."
-            terraform apply -var-file=tfvars\terraform-dev.tfvars --auto-approve tfplan 
+            terraform apply -var-file=tfvars/terraform-dev.tfvars --auto-approve tfplan 
           fi
       working-directory: ${{ env.WORKING_DIRECTORY }}
