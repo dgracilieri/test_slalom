@@ -9,7 +9,7 @@ env:
   AWS_REGION: 'us-east-1'
   TF_VERSION: '1.13.1'
   WORKING_DIRECTORY: 'infra'
-  DESTROY_FLAG: $(jq -r '.destroy_infrastructure' tfvars/vars.json)
+  
 
 jobs:
   terraform:
@@ -82,12 +82,13 @@ jobs:
       id: plan
       #run: terraform plan -no-color -out=tfplan -var-file=tfvars/terraform-dev.tfvars
       run: |
-          
-          if [[ ${{ env.DESTROY_FLAG }} == "true"]]; then
-            echo "dont run for destroy infraestructure"
-          else
-            terraform plan -no-color -out=tfplan -var-file=tfvars/terraform-dev.tfvars
-          fi
+          DESTROY_FLAG=$(jq -r '.destroy_infrastructure' tfvars/vars.json)
+          echo $DESTROY_FLAG
+          # if [[ "$DESTROY_FLAG" == "true"]]; then
+          #   echo "dont run for destroy infraestructure"
+          # else
+          #   terraform plan -no-color -out=tfplan -var-file=tfvars/terraform-dev.tfvars
+          # fi
           
       working-directory: ${{ env.WORKING_DIRECTORY }}
 
@@ -101,15 +102,15 @@ jobs:
     #   run: terraform destroy -auto-approve -var-file=tfvars/terraform-dev.tfvars tfplan 
     #   working-directory: ${{ env.WORKING_DIRECTORY }}
 
-    - name: Conditional Terraform Apply or Destroy
-      id: apply_or_destroy
-      run: |
+    # - name: Conditional Terraform Apply or Destroy
+    #   id: apply_or_destroy
+    #   run: |
  
-          if [[ ${{ env.DESTROY_FLAG }} == "true" ]]; then
-            echo "Variable 'destroy_infrastructure' es 'true'. running 'terraform destroy'."
-            terraform destroy -var-file=tfvars/tfvars/vars.json --auto-approve tfplan 
-          else
-            echo "Variable 'destroy_infrastructure' es 'false'. running 'terraform apply'."
-            terraform apply -var-file=tfvars/tfvars/vars.json --auto-approve tfplan 
-          fi
-      working-directory: ${{ env.WORKING_DIRECTORY }}
+    #       if [[ ${{ env.DESTROY_FLAG }} == "true" ]]; then
+    #         echo "Variable 'destroy_infrastructure' es 'true'. running 'terraform destroy'."
+    #         terraform destroy -var-file=tfvars/tfvars/vars.json --auto-approve tfplan 
+    #       else
+    #         echo "Variable 'destroy_infrastructure' es 'false'. running 'terraform apply'."
+    #         terraform apply -var-file=tfvars/tfvars/vars.json --auto-approve tfplan 
+    #       fi
+    #   working-directory: ${{ env.WORKING_DIRECTORY }}
