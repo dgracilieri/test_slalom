@@ -9,6 +9,7 @@ env:
   AWS_REGION: 'us-east-1'
   TF_VERSION: '1.13.1'
   WORKING_DIRECTORY: 'infra'
+  DESTROY_FLAG: $(jq -r '.destroy_infrastructure' tfvars/vars.json)
 
 jobs:
   terraform:
@@ -41,10 +42,12 @@ jobs:
     - name: Terraform Format
       id: format
       run: terraform fmt -recursive
+      working-directory:  ${{ env.WORKING_DIRECTORY }}
 
     - name: Terraform Validate
       id: validate
       run: terraform validate -no-color
+      working-directory:  ${{ env.WORKING_DIRECTORY }}
     
       #Validate static code in IaC
     - name: Checkov Scan
@@ -79,8 +82,8 @@ jobs:
       id: plan
       #run: terraform plan -no-color -out=tfplan -var-file=tfvars/terraform-dev.tfvars
       run: |
-          DESTROY_FLAG=$(jq -r '.destroy_infrastructure' tfvars/vars.json)
-          if [[ "$DESTROY_FLAG" == "true"]]; then
+          
+          if [[ ${{ env.DESTROY_FLAG }} == "true"]]; then
             echo "dont run for destroy infraestructure"
           else
             terraform plan -no-color -out=tfplan -var-file=tfvars/terraform-dev.tfvars
@@ -101,9 +104,8 @@ jobs:
     - name: Conditional Terraform Apply or Destroy
       id: apply_or_destroy
       run: |
-          DESTROY_FLAG=$(jq -r '.destroy_infrastructure' tfvars/vars.json)
-          
-          if [[ "$DESTROY_FLAG" == "true" ]]; then
+ 
+          if [[ ${{ env.DESTROY_FLAG }} == "true" ]]; then
             echo "Variable 'destroy_infrastructure' es 'true'. running 'terraform destroy'."
             terraform destroy -var-file=tfvars/tfvars/vars.json --auto-approve tfplan 
           else
