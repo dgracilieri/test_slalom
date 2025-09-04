@@ -97,6 +97,7 @@ resource "aws_sns_topic" "s3_bucket_notifications" {
 }
 
 resource "aws_s3_bucket_notification" "s3_bucket_notification" {
+  depends_on = [aws_sns_topic_policy.sns_topic_policy]
   bucket = aws_s3_bucket.s3_bucket[0].id
 
   topic {
