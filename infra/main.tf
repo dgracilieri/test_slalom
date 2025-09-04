@@ -91,9 +91,6 @@ resource "aws_s3_bucket_versioning" "bucket_versioning" {
     }
 
 
-
-
-
 resource "aws_sns_topic" "s3_bucket_notifications" {
   name = "bucket-notifications"
   kms_master_key_id = "alias/aws/sns"
@@ -107,4 +104,28 @@ resource "aws_s3_bucket_notification" "s3_bucket_notification" {
     events        = ["s3:ObjectCreated:*"]
     filter_prefix = "logs/"
   }
+}
+
+resource "aws_sns_topic_policy" "sns_topic_policy" {
+  arn = aws_sns_topic.sns_topic.arn
+
+  policy = jsonencode({
+    Version = "2008-10-17",
+    Statement = [
+      {
+        Sid       = "AllowS3ToPublish",
+        Effect    = "Allow",
+        Principal = {
+          Service = "s3.amazonaws.com"
+        },
+        Action    = "SNS:Publish",
+        Resource  = aws_sns_topic.sns_topic.arn,
+        Condition = {
+          ArnEquals = {
+            "aws:SourceArn" = aws_s3_bucket.s3_bucket.arn
+          }
+        }
+      }
+    ]
+  })
 }
