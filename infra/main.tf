@@ -107,7 +107,7 @@ resource "aws_s3_bucket_notification" "s3_bucket_notification" {
 }
 
 resource "aws_sns_topic_policy" "sns_topic_policy" {
-  arn = aws_sns_topic.sns_topic.arn
+  arn = aws_sns_topic.s3_bucket_notifications.arn
 
   policy = jsonencode({
     Version = "2008-10-17",
@@ -119,10 +119,10 @@ resource "aws_sns_topic_policy" "sns_topic_policy" {
           Service = "s3.amazonaws.com"
         },
         Action    = "SNS:Publish",
-        Resource  = aws_sns_topic.sns_topic.arn,
+        Resource  = aws_sns_topic.s3_bucket_notifications.arn,
         Condition = {
           ArnEquals = {
-            "aws:SourceArn" = aws_s3_bucket.s3_bucket.arn
+            "aws:SourceArn" = aws_s3_bucket.s3_bucket[0].arn
           }
         }
       }
