@@ -1,3 +1,3 @@
 {
-  "destroy_infrastructure": false
+  "destroy_infrastructure": true
 }
