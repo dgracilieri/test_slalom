@@ -79,7 +79,7 @@ jobs:
       id: plan
       #run: terraform plan -no-color -out=tfplan -var-file=tfvars/terraform-dev.tfvars
       run: |
-        DESTROY_FLAG=$(jq -r '.destroy_infrastructure' tfvars/terraform-dev.tfvars)
+        DESTROY_FLAG=$(jq -r '.destroy_infrastructure' tfvars/vars.json)
         if [[ "$DESTROY_FLAG" == "true"]];then
           echo "dont run for destroy infraestructure"
         else
