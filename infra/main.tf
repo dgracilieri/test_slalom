@@ -91,17 +91,8 @@ resource "aws_s3_bucket_versioning" "bucket_versioning" {
     }
 
 
-# resource "aws_s3_bucket_acl" "s3_bucket_acl" {
-#   bucket = aws_s3_bucket_logging.s3_bucket.id
-#   acl    = "private"
-# }
 
-resource "aws_s3_bucket_logging" "s3_bucket_log" {
-  bucket = "${var.name_prefix}-my-s3-access-logs-${var.name_postfix}"
-  target_bucket = aws_s3_bucket.s3_bucket[0].id
-  target_prefix = "log/"
 
-}
 
 resource "aws_sns_topic" "s3_bucket_notifications" {
   name = "bucket-notifications"
