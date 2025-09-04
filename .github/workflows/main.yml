@@ -80,20 +80,17 @@ jobs:
 
     - name: Terraform Plan
       id: plan
-      #run: terraform plan -no-color -out=tfplan -var-file=tfvars/terraform-dev.tfvars
-      run: terraform plan -no-color -out=tfplan -var-file=tfvars/terraform-dev.tfvars
+
+      run: |
+          DESTROY_FLAG=$(jq -r '.destroy_infrastructure' tfvars/vars.json)
+          if [[ "$DESTROY_FLAG" == "true" ]]; then
+            echo "destroy iac"
+          else
+            terraform plan -no-color -out=tfplan -var-file=tfvars/terraform-dev.tfvars
+          fi
       working-directory: ${{ env.WORKING_DIRECTORY }}
 
-    # - name: Terraform Apply
-    #   id: apply
-    #   run: terraform apply -var-file=tfvars/terraform-dev.tfvars --auto-approve tfplan 
-    #   working-directory:  ${{ env.WORKING_DIRECTORY }}
-    # - name: Terraform Destroy
-    #   id: destroy
-    #   if: github.ref == 'refs/heads/destroy-env' && github.event_name == 'push'
-    #   run: terraform destroy -auto-approve -var-file=tfvars/terraform-dev.tfvars tfplan 
-    #   working-directory: ${{ env.WORKING_DIRECTORY }}
-
+    
     - name: Conditional Terraform Apply or Destroy
       id: apply_or_destroy
       run: |
