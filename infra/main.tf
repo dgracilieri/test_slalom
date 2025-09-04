@@ -92,7 +92,7 @@ resource "aws_s3_bucket_versioning" "bucket_versioning" {
 
 
 resource "aws_s3_bucket_acl" "s3_bucket_acl" {
-  bucket = aws_s3_bucket_logging.s3_bucket_log.id
+  bucket = aws_s3_bucket_logging.s3_bucket.id
   acl    = "private"
 }
 
@@ -109,7 +109,7 @@ resource "aws_sns_topic" "s3_bucket_notifications" {
 }
 
 resource "aws_s3_bucket_notification" "s3_bucket_notification" {
-  bucket = aws_s3_bucket.s3_bucket[0].id
+  bucket = aws_s3_bucket.s3_bucket.id
 
   topic {
     topic_arn     = aws_sns_topic.s3_bucket_notifications.arn
