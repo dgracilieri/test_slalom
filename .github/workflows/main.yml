@@ -3,11 +3,15 @@ name: 'Terraform Deploy'
 on:
   push:
     branches:
-        - main
         - dgracili
+  pull_request:
+    branches:
+        - main
 env:
-  AWS_REGION: us-east-1
-  TF_VERSION: 1.13.1
+  AWS_REGION: 'us-east-1'
+  TF_VERSION: '1.13.1'
+  WORKING_DIRECTORY: 'infra'
+  
 
 jobs:
   terraform:
@@ -24,8 +28,7 @@ jobs:
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: ${{ env.TF_VERSION }}
-        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
+       
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -35,29 +38,70 @@ jobs:
 
     - name: Terraform Init
       run: terraform init
+      working-directory:  ${{ env.WORKING_DIRECTORY }}
 
+      #Validate IaC in terraform
     - name: Terraform Format
       id: format
-      run: terraform fmt 
+      run: terraform fmt -recursive
+      working-directory:  ${{ env.WORKING_DIRECTORY }}
 
     - name: Terraform Validate
       id: validate
       run: terraform validate -no-color
+      working-directory:  ${{ env.WORKING_DIRECTORY }}
     
-    - name: Run Checkov
+      #Validate static code in IaC
+    - name: Checkov Scan
       id: checkov
       uses: bridgecrewio/checkov-action@v12
       with:
         directory: . 
-        framework: terraform 
-      continue-on-error: false 
+        framework: terraform
+        soft_fail: true  
+        output_format: json 
+        output_file_path: checkov_results.json
+    
+    # - name: Check for Critical Findings
+    #   id: check_critical
+    #   run: |
+    #     critical_count=$(jq '.results.failed_checks | map(select(.severity=="CRITICAL")) | length' checkov_results.json)
+    #     high_count=$(jq '.results.failed_checks | map(select(.severity=="HIGH")) | length' checkov_results.json)
+          
+    #     echo "Vulnerabilidades críticas: $critical_count"
+    #     echo "Vulnerabilidades altas: $high_count"
+
+    #     if [[ $critical_count -gt 0 || $high_count -gt 0 ]]; then
+    #       echo "::error::Se encontraron vulnerabilidades CRÍTICAS o ALTAS. Deteniendo el despliegue."
+    #       exit 1
+    #     fi
+    #   shell: bash
+      env:
+        ACTIONS_STEP_DEBUG: true
+
 
     - name: Terraform Plan
       id: plan
-      run: |
-          terraform plan -no-color -out=tfplan
-          terraform show -no-color tfplan
 
-    - name: Terraform Apply
-      id: apply
-      run: terraform apply -auto-approve tfplan
+      run: |
+          DESTROY_FLAG=$(jq -r '.destroy_infrastructure' tfvars/vars.json)
+          if [[ "$DESTROY_FLAG" == "true" ]]; then
+            echo "destroy iac"
+          else
+            terraform plan -no-color -out=tfplan -var-file=tfvars/terraform-dev.tfvars
+          fi
+      working-directory: ${{ env.WORKING_DIRECTORY }}
+
+    
+    - name: Conditional Terraform Apply or Destroy
+      id: apply_or_destroy
+      run: |
+          DESTROY_FLAG=$(jq -r '.destroy_infrastructure' tfvars/vars.json)
+          if [[  "$DESTROY_FLAG" == "true" ]]; then
+            echo "Variable 'destroy_infrastructure' es 'true'. running 'terraform destroy'."
+            terraform destroy -var-file=tfvars/terraform-dev.tfvars -auto-approve
+          else
+            echo "Variable 'destroy_infrastructure' es 'false'. running 'terraform apply'."
+            terraform apply -var-file=tfvars/terraform-dev.tfvars -auto-approve tfplan 
+          fi
+      working-directory: ${{ env.WORKING_DIRECTORY }}
